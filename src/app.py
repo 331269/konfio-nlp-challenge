@@ -4,6 +4,8 @@ Uso (desde la carpeta del proyecto):
     uv run streamlit run src/app.py
 """
 print('Iniciando la app...', flush=True)
+from pathlib import Path
+
 import pandas as pd
 import shap
 import streamlit as st
@@ -62,6 +64,7 @@ with st.sidebar:
     st.caption(f'Modelo: Fine-Tuning de paraphrase-multilingual-mpnet-base-v2, extracción de features y '
                f'Regresión Logística por etiqueta. Corriendo en **{modelo.device.upper()}**.')
 
+st.image(str(Path(__file__).parent / 'img' / 'konfio_logo.png'), width=220)
 st.title('Konfío Challenge: loan classification')
 st.write('Escribe el motivo por el que el cliente solicita el crédito y el modelo le asignará una o varias etiquetas.')
 
