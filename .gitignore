@@ -1,0 +1,13 @@
+# Entorno virtual (se recrea con `uv sync`)
+.venv/
+
+# Modelo entrenado (~1.1 GB, se regenera desde el notebook)
+modelo_final/
+
+# Datos y enunciado proporcionados por Konfío (no se versionan)
+intent.csv
+DS_application_exercise_nlp.pdf
+
+# Temporales de Python y Jupyter
+__pycache__/
+.ipynb_checkpoints/
