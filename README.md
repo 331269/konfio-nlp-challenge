@@ -19,3 +19,15 @@ Todo el análisis, las decisiones y los resultados están en [`challenge.ipynb`]
    ```
 2. Colocar `intent.csv` (proporcionado por Konfío, no incluido en el repo) en la raíz del proyecto.
 3. Ejecutar `challenge.ipynb`. El fine-tuning requiere GPU (probado en una RTX 4050 de 6 GB).
+
+## App de clasificación (Streamlit)
+
+La app usa el modelo que guarda el notebook en `modelo_final/` (no incluido en el repo por su tamaño):
+
+```bash
+uv run streamlit run src/app.py
+```
+
+- **Un texto:** asigna las etiquetas, muestra la probabilidad de cada una y explica con SHAP qué palabras influyeron.
+- **Varios textos:** clasifica un CSV con una columna `motivos` y permite descargar los resultados.
+- Desde la barra lateral se elige entre los umbrales por etiqueta y un umbral de 0.5.
