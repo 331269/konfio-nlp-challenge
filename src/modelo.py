@@ -4,6 +4,7 @@ Reproduce el mismo pipeline del notebook:
 texto -> Transformer ajustado (Fine-Tuning) -> vector de 768 (mean pooling, normalizado) -> LogReg por etiqueta.
 """
 import json
+import os
 from pathlib import Path
 
 import joblib
@@ -12,6 +13,9 @@ import torch
 from transformers import AutoModel, AutoTokenizer
 
 RUTA_MODELO = Path(__file__).resolve().parent.parent / 'modelo_final'
+
+# En la nube el modelo no está en el repo (pesa ~1 GB), así que lo descargamos de Hugging Face
+REPO_HF = os.environ.get('MODELO_HF')
 
 DESCRIPCIONES = {
     'crec': 'Expansión (estrategia de crecimiento)',
@@ -32,6 +36,9 @@ class ClasificadorCreditos:
 
     def __init__(self, ruta=RUTA_MODELO):
         ruta = Path(ruta)
+        if not (ruta / 'encoder').exists() and REPO_HF:
+            from huggingface_hub import snapshot_download
+            ruta = Path(snapshot_download(REPO_HF))
         if not (ruta / 'encoder').exists():
             raise FileNotFoundError(
                 f'No se encontró el modelo en {ruta}. Hay que correr la celda del notebook que entrena y guarda '
@@ -44,7 +51,8 @@ class ClasificadorCreditos:
 
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.tokenizer = AutoTokenizer.from_pretrained(ruta / 'encoder')
-        self.encoder = AutoModel.from_pretrained(ruta / 'encoder').to(self.device).eval()
+        # El encoder se sube en fp16 para que pese la mitad; en CPU lo regresamos a fp32
+        self.encoder = AutoModel.from_pretrained(ruta / 'encoder', dtype=torch.float32).to(self.device).eval()
         self.clf = joblib.load(ruta / 'logreg.joblib')
 
     @torch.no_grad()

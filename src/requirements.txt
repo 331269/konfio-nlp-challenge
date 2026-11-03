@@ -1,0 +1,11 @@
+# Dependencias de la app para Streamlit Community Cloud (solo CPU, sin TensorFlow ni CUDA)
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.11.0
+transformers==5.22.1
+huggingface_hub==2.4.0
+scikit-learn==1.9.1
+joblib==1.6.0
+numpy==2.5.4
+pandas==3.1.0
+shap==0.54.1
+streamlit==1.66.1
