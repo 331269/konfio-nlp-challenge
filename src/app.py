@@ -3,6 +3,7 @@
 Uso (desde la carpeta del proyecto):
     uv run streamlit run src/app.py
 """
+print('Iniciando la app...', flush=True)
 import pandas as pd
 import shap
 import streamlit as st
