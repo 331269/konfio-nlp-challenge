@@ -53,9 +53,18 @@ class ClasificadorCreditos:
 
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.tokenizer = AutoTokenizer.from_pretrained(ruta / 'encoder')
-        # El encoder se sube en fp16 para que pese la mitad; en CPU lo regresamos a fp32
         print('Cargando el encoder en memoria...', flush=True)
-        self.encoder = AutoModel.from_pretrained(ruta / 'encoder', dtype=torch.float32).to(self.device).eval()
+        if self.device == 'cuda':
+            self.encoder = AutoModel.from_pretrained(ruta / 'encoder', dtype=torch.float32).to(self.device).eval()
+        else:
+            # En CPU (Streamlit Cloud) la memoria es poca: los embeddings del vocabulario (192M de parámetros)
+            # se quedan en bfloat16 y el resto del modelo en fp32. Ahorra ~400 MB sin cambiar las predicciones.
+            self.encoder = AutoModel.from_pretrained(ruta / 'encoder', dtype=torch.bfloat16).eval()
+            emb = self.encoder.get_input_embeddings()
+            pesos_vocab = emb.weight.data
+            self.encoder.float()
+            emb.weight.data = pesos_vocab
+            emb.register_forward_hook(lambda modulo, entrada, salida: salida.float())
         self.clf = joblib.load(ruta / 'logreg.joblib')
         print(f'Modelo listo ({self.device})', flush=True)
 
